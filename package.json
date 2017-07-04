@@ -1,0 +1,26 @@
+{
+  "name": "joi-i18n",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "types": "types.d.ts",
+  "scripts": {
+    "test": "ts-mocha test/**/*.spec.ts",
+    "build": "tsc -p tsconfig-build.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "joi": ">=10.x <11.x"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.1",
+    "@types/joi": "^10.4.0",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^8.0.7",
+    "chai": "^4.0.2",
+    "mocha": "^3.4.2",
+    "ts-mocha": "^1.0.3",
+    "typescript": "^2.4.1"
+  }
+}

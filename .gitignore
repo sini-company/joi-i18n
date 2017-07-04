@@ -1,0 +1,22 @@
+# Logs
+logs
+*.log
+*-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Output of 'npm pack'
+*.tgz
+
+# Distribution outputs
+dist/
