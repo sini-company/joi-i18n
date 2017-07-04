@@ -5,8 +5,10 @@
   "main": "index.js",
   "types": "types.d.ts",
   "scripts": {
+    "pretest": "tsc --noEmit",
     "test": "ts-mocha test/**/*.spec.ts",
-    "build": "tsc -p tsconfig-build.json"
+    "build": "tsc -p tsconfig-build.json",
+    "prepublish": "npm run build"
   },
   "author": "",
   "license": "ISC",
@@ -23,5 +25,8 @@
     "mocha": "^3.4.2",
     "ts-mocha": "^1.0.3",
     "typescript": "^2.4.1"
+  },
+  "engines": {
+    "node": ">=4.0.0"
   }
 }
