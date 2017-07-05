@@ -83,17 +83,16 @@ A static method that will set default locale for every validate options where:
 
 - `locale` a registered locale via [Joi#addLocaleData()](#joiaddlocaledatalocale-data)
 
-
 ## Description
 
 It overrides two internal methods of Joi's `Any` class prototype which are:
 
-**_valiateWithOptions(value, options, callback)**: the original **validate()** implementation
-- Set [[options.language]](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) property with provided locale via `Joi.addLocale(locale, language)`
-- Set [schema.error(err)](https://github.com/hapijs/joi/blob/master/API.md#anyerrorerr) handler to **format each single error items** before return result.
+[`_valiateWithOptions(value, options, callback)`](https://github.com/hapijs/joi/blob/v10.6.0/lib/types/any/index.js#L643): the original **validate()** implementation with followings modifications:
+- set [`options.language`](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) property with provided locale via `Joi.addLocale(locale, language)`
+- set [`schema.error(err)`](https://github.com/hapijs/joi/blob/master/API.md#anyerrorerr) handler to **format each single error items** before return result.
 
-**checkOptions(options)**: the original options argument validator
-- Overrides internal validator to allow additional options property `{ locale: string }`
+[`checkOptions(options)`](https://github.com/hapijs/joi/blob/v10.6.0/lib/types/any/index.js#L84): the original options argument validator
+- Overrides internal validator to allow additional `{ locale: string }` property
 
 **NOTE**
 Since above two functions are designed for internal use, they might be changed.
