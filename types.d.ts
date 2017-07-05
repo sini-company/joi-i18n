@@ -13,10 +13,8 @@ declare module 'joi' {
   export type ErrorFormatFunction = (error: ValidationErrorItem) => string;
   export type ErrorTypeDescriptor = string | ErrorFormatFunction | {
     [key: string]: ErrorTypeDescriptor;
-    base?: ErrorTypeDescriptor;
-    required?: ErrorTypeDescriptor;
   };
-  export type DefaultTypes = 'any' | 'alternatives' | 'array' | 'string' | 'number' | 'object' | 'boolean' | 'binary' | 'date' | 'function' | ';azy';
+  export type DefaultTypes = 'any' | 'alternatives' | 'array' | 'string' | 'number' | 'object' | 'boolean' | 'binary' | 'date' | 'function' | 'lazy';
   export type LanguageErrorsDescriptor = Partial<Record<DefaultTypes, ErrorTypeDescriptor>> & {
     [key: string]: ErrorTypeDescriptor
   };
