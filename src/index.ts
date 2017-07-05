@@ -42,6 +42,9 @@ function setDefaultLocale(locale: string, supressWarning?: boolean) {
 
 function injectLocale() {
   if (Joi['_locales'] === undefined) {
+    // set locales data
+    Joi['_locales'] = internals.locales;
+
     // add joi-i18n helper methods to the root Joi object
     (Joi as Partial<typeof Joi>).addLocaleData = addLocaleData;
     (Joi as Partial<typeof Joi>).setDefaultLocale = setDefaultLocale;
@@ -90,7 +93,10 @@ function injectLocale() {
               return error;
             };
 
+            // create error-handler wrapped schema
             const wrappedSchema = this.error((errors) => errors.map(mapValidationErrorItem));
+
+            // return wrapped-schema validator result
             return superMethod.call(wrappedSchema, value, options, callback);
           }
         } else if (locale !== internals.defaultLocale) {
