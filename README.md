@@ -2,7 +2,7 @@
 
 An i18n support mixins for [Joi](https://github.com/hapijs/joi) object validator.
 
-[![Build Status](https://travis-ci.org/sini-company/joi-i18n.svg?branch=master)](https://travis-ci.org/sini-company/joi-i18n) [![Current Version](https://img.shields.io/npm/v/good-path-glob.svg?style=flat)](https://www.npmjs.com/package/joi-i18n) [![Known Vulnerabilities](https://snyk.io/test/github/sini-company/joi-i18n/badge.svg)](https://snyk.io/test/github/sini-company/joi-i18n)
+[![Build Status](https://travis-ci.org/sini-company/joi-i18n.svg?branch=master)](https://travis-ci.org/sini-company/joi-i18n) [![Current Version](https://img.shields.io/npm/v/joi-i18n.svg?style=flat)](https://www.npmjs.com/package/joi-i18n) [![Known Vulnerabilities](https://snyk.io/test/github/sini-company/joi-i18n/badge.svg)](https://snyk.io/test/github/sini-company/joi-i18n)
 
 
 ## Usage
