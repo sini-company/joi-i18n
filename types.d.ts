@@ -19,7 +19,7 @@ declare module 'joi' {
     [key: string]: ErrorTypeDescriptor
   };
   export type LanguageDescriptor = {
-    errors?: LanguageErrorsDescriptor & {
+    errors: LanguageErrorsDescriptor & {
       root?: string;
       key?: string;
       messages?: { wrapArrays?: boolean };
