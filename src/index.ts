@@ -1,22 +1,33 @@
 import * as Joi from 'joi';
-import { reach, assertWithSchema, overrideMethodProperty } from './utils';
+import { reach, assert, merge, overrideMethodProperty } from './utils';
+
+namespace Schemas {
+  export const locale = Joi.string().token();
+  export const errorDescriptor = Joi.alternatives().try([
+    Joi.string(),
+    Joi.func(),
+    Joi.object().pattern(/.+/, Joi.lazy(() => errorDescriptor).required())
+  ]);
+  export const addLocaleOptions = Joi.object({
+    locale: locale.required(),
+    language: Joi.object({
+      errors: Joi.object({
+        root: Joi.string(),
+        key: Joi.string(),
+      }).pattern(/.+/, Joi.object().pattern(/.+/, errorDescriptor.required()))
+        .required()
+    }).required()
+  });
+}
 
 const internals = {
   locales: {},
   defaultLocale: undefined
 };
 
-const schemas = {
-  locale: Joi.string().label('locale'),
-  addLocaleOptions: Joi.object({
-    locale: Joi.lazy(() => schemas.locale).required(),
-    language: Joi.object().required()
-  }),
-}
-
 function addLocaleData(locale: string, language: object) {
   // assert arguments
-  assertWithSchema({ locale, language }, schemas.addLocaleOptions);
+  assert({ locale, language }, Schemas.addLocaleOptions);
 
   if (locale in internals.locales) {
     console.warn(`locale ${locale} is already registered! The previous data will be overrided.`)
@@ -31,7 +42,7 @@ function setDefaultLocale(locale: string, supressWarning?: boolean) {
     delete internals.defaultLocale;
   } else {
     // assert arguments
-    assertWithSchema(locale, schemas.locale);
+    assert(locale, Schemas.locale);
     if (locale in internals.locales) {
       internals.defaultLocale = locale;
     } else if (!supressWarning) {
@@ -71,7 +82,7 @@ function injectLocale() {
 
           if (typeof language === 'object' && Object.keys(language).length > 0) {
             if (options && !options.language) {
-              options = { ...options, language };
+              options = merge({ ...options }, { language });
             }
 
             // wrap error processor using Joi.error method
@@ -82,7 +93,7 @@ function injectLocale() {
               }
 
               // get template function or string
-              const template = reach(language, error.type);
+              const template = reach(options, `language.errors.${error.type}`) || reach(language, error.type);
               if (typeof template === 'function') {
                 error.message = template(error);
               } else if (typeof template === 'string') {
@@ -112,7 +123,7 @@ function injectLocale() {
     overrideMethodProperty(anyPrototype, 'checkOptions', (superMethod) => {
       return function checkOptionsWrapper({ locale, ...options }: Joi.ValidationOptions = {}) {
         // assert arguments
-        assertWithSchema(locale, schemas.locale);
+        assert(locale, Schemas.locale);
 
         // validate option using original checkOptions
         return superMethod.call(this, options);

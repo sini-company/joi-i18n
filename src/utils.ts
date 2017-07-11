@@ -11,6 +11,19 @@ export function reach(target: object, path: string): any {
   return target;
 }
 
+export function merge(target, source) {
+  for (const key in source) {
+    try {
+      target[key] = typeof source[key] === 'object'
+        ? { ...merge(target[key], source[key]) }
+        : source[key];
+    } catch (e) {
+      target[key] = source[key];
+    }
+  }
+  return target;
+}
+
 export function overrideMethodProperty(object: object, key: string, method: (superMethod: Function) => Function): void {
   const descriptor = Object.getOwnPropertyDescriptor(object, key);
   if (!descriptor) {
@@ -30,7 +43,7 @@ export function overrideMethodProperty(object: object, key: string, method: (sup
   });
 }
 
-export function assertWithSchema(value: any, schema: Joi.Schema): void {
+export function assert(value: any, schema: Joi.Schema): void {
   const { error } = schema.validate(value);
   if (error) {
     throw new Error(error.details[0].message);
