@@ -110,13 +110,35 @@ describe('joi-i18n', () => {
         }
       };
       const { error } = schema.validate({ number: 'string' }, options);
+      expect(error).to.exist;
+      expect(error).to.have.nested.property('details[0].message', `is it number?`);
+    });
+
+    it('should format Joi.validate() over child schema\'s options first', () => {
+      const schema = Joi.object({
+        boolean: Joi.boolean().options({
+          language: {
+            errors: { boolean: { base: '!!is it boolean?' } }
+          }
+        })
+      });
+      const { error } = schema.validate({ boolean: 'string' });
+      expect(error).to.exist;
+      expect(error).to.have.nested.property('details[0].message', `is it boolean?`);
+    });
+
+    it('should not mutate provided options object', () => {
+      const options = {
+        language: {
+          errors: { number: { base: '!!is it number?' } }
+        }
+      };
+      schema.validate({}, options);
       expect(options).to.deep.equals({
         language: {
           errors: { number: { base: '!!is it number?' } }
         }
       });
-      expect(error).to.exist;
-      expect(error).to.have.nested.property('details[0].message', `is it number?`);
     });
   });
 });

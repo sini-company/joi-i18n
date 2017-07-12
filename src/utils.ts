@@ -11,7 +11,7 @@ export function reach(target: object, path: string): any {
   return target;
 }
 
-export function merge(target, source) {
+export function merge(target: object, source: object) {
   for (const key in source) {
     try {
       target[key] = typeof source[key] === 'object'

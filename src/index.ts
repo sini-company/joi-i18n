@@ -99,7 +99,7 @@ function injectLocale() {
               }
 
               // get template function or string
-              const template = reach(options, `language.errors.${error.type}`) || reach(errors, error.type);
+              const template = reach(error.options, `language.errors.${error.type}`) || reach(errors, error.type);
               if (typeof template === 'function') {
                 error.message = template(error);
               } else if (typeof template === 'string') {
