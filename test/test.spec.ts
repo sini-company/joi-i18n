@@ -40,6 +40,23 @@ describe('joi-i18n', () => {
     });
   });
 
+  describe('setDefaultLocale', () => {
+    before(() => Joi.setDefaultLocale('ko_KR'));
+    after(() => Joi.setDefaultLocale(null));
+
+    it('should throw error under invalid locale string', () => {
+      expect(() => {
+        Joi.setDefaultLocale('!@$%$')
+      }).to.throw('"locale" must only contain alpha-numeric and underscore characters');
+    });
+
+    it('should format Joi.validate() in default locale', () => {
+      const { error } = Joi.object({ number: Joi.number() }).validate({ number: 'string' });
+      expect(error).to.exist;
+      expect(error).to.have.nested.property('details[0].message', `"number" 은(는) 숫자 형태여야 합니다`);
+    });
+  });
+
   describe('validate', () => {
     before(() => {
       Joi.addLocaleData('ko_KR', {
@@ -137,23 +154,6 @@ describe('joi-i18n', () => {
         language: {
           number: { base: '!!is it number?' }
         }
-      });
-    });
-
-    describe('setDefaultLocale', () => {
-      before(() => Joi.setDefaultLocale('ko_KR'));
-      after(() => Joi.setDefaultLocale(null));
-
-      it('should throw error under invalid locale string', () => {
-        expect(() => {
-          Joi.setDefaultLocale('!@$%$')
-        }).to.throw('"locale" must only contain alpha-numeric and underscore characters');
-      });
-
-      it('should format Joi.validate() over Joi.setDefaultLocale() first', () => {
-        const { error } = schema.validate({ number: 'string' });
-        expect(error).to.exist;
-        expect(error).to.have.nested.property('details[0].message', `"number" 은(는) 숫자 형태여야 합니다`);
       });
     });
   });
