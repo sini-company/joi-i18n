@@ -4,9 +4,9 @@ import { reach, assert, merge, overrideMethodProperty } from './utils';
 namespace Schemas {
   export const locale = Joi.string().token();
   export const errorDescriptor = Joi.alternatives().try([
-    Joi.string(),
+    Joi.string().allow(null),
     Joi.func(),
-    Joi.object().pattern(/.+/, Joi.lazy(() => errorDescriptor).required())
+    Joi.object().pattern(/.+/, Joi.lazy(() => errorDescriptor).required()),
   ]);
   export const addLocaleOptions = Joi.object({
     locale: locale.required(),
@@ -14,6 +14,9 @@ namespace Schemas {
       errors: Joi.object({
         root: Joi.string(),
         key: Joi.string(),
+        message: Joi.object({
+          wrapArrays: Joi.boolean()
+        })
       }).pattern(/.+/, Joi.object().pattern(/.+/, errorDescriptor.required()))
         .required()
     }).required()
@@ -77,12 +80,15 @@ function injectLocale() {
         // override locale wrapper if exists
         if (locale && locale in internals.locales) {
           // pick language from global locale or validator._settings
-          const language = reach(this, `_settings.language.errors`) // use given settings first
+          const errors = reach(this, `_settings.language.errors`) // use given settings first
             || reach(internals.locales, `${locale}.errors`); // use global locale settings second
 
-          if (typeof language === 'object' && Object.keys(language).length > 0) {
-            if (options && !options.language) {
-              options = merge({ ...options }, { language });
+          if (typeof errors === 'object' && Object.keys(errors).length > 0) {
+            if (options) {
+              options = {
+                ...options,
+                language: options.language ? merge({ errors: { ...errors } }, options.language) : errors
+              };
             }
 
             // wrap error processor using Joi.error method
@@ -93,7 +99,7 @@ function injectLocale() {
               }
 
               // get template function or string
-              const template = reach(options, `language.errors.${error.type}`) || reach(language, error.type);
+              const template = reach(options, `language.errors.${error.type}`) || reach(errors, error.type);
               if (typeof template === 'function') {
                 error.message = template(error);
               } else if (typeof template === 'string') {
