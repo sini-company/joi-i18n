@@ -6,36 +6,34 @@ describe('joi-i18n', () => {
   describe('addLocaleData', () => {
     it('should throw error under invalid locale code', () => {
       expect(() => {
-        Joi.addLocaleData('!!invalid_character!!', { errors: {} });
+        Joi.addLocaleData('!!invalid_character!!', { any: {} });
       }).to.throw('"locale" must only contain alpha-numeric and underscore characters');
     });
 
     it('should throw error under invalid language object', () => {
       expect(() => {
-        Joi.addLocaleData('test_locale_1', { errors: null });
-      }).to.throw('"errors" must be an object');
+        Joi.addLocaleData('test_locale_1', { any: null });
+      }).to.throw('"any" must be an object');
     });
 
     it('should throw error under invalid language error descriptor (number provided)', () => {
       expect(() => {
-        Joi.addLocaleData('test_locale_2', { errors: { any: { base: 1 } } as any });
+        Joi.addLocaleData('test_locale_2', { any: { base: 1 } as any });
       }).to.throws(`"base" must be a string`);
     });
 
     it('should throw error under invalid language error descriptor (number provided for errors.key)', () => {
       expect(() => {
-        Joi.addLocaleData('test_locale_3', { errors: { key: 1 } as any });
+        Joi.addLocaleData('test_locale_3', { key: 1 } as any);
       }).to.throws(`"key" must be a string`);
     });
 
     it('should not throw error under valid arguments', () => {
       expect(() => {
         Joi.addLocaleData('test_locale_4', {
-          errors: {
-            any: {
-              base: '!!Good',
-              required: (error) => `It's OK to register a function`
-            }
+          any: {
+            base: '!!Good',
+            required: (error) => `It's OK to register a function`
           }
         });
       }).to.not.throw();
@@ -45,17 +43,16 @@ describe('joi-i18n', () => {
   describe('validate', () => {
     before(() => {
       Joi.addLocaleData('ko_KR', {
-        errors: {
-          number: {
-            base: (error) => `"${error.path}" 은(는) 숫자 형태여야 합니다`,
-            required: '!!{{key}}가 정의되지 않았습니다.'
-          }
+        number: {
+          base: (error) => `"${error.path}" 은(는) 숫자 형태여야 합니다`,
+          required: '!!{{key}}가 정의되지 않았습니다.'
+        },
+        boolean: {
+          base: '!!{{key}}는 boolean 형태로 제공해 주세요.'
         }
       });
       Joi.addLocaleData('custom_key_locale', {
-        errors: {
-          key: '[{{key}}] '
-        }
+        key: '[{{key}}] '
       });
     })
 
@@ -94,19 +91,10 @@ describe('joi-i18n', () => {
       expect(error).to.have.nested.property('details[0].message', `[number] must be a number`);
     });
 
-    before(() => Joi.setDefaultLocale('ko_KR'));
-    after(() => Joi.setDefaultLocale(null));
-
-    it('should format Joi.validate() over Joi.setDefaultLocale() first', () => {
-      const { error } = schema.validate({ number: 'string' });
-      expect(error).to.exist;
-      expect(error).to.have.nested.property('details[0].message', `"number" 은(는) 숫자 형태여야 합니다`);
-    });
-
     it('should format Joi.validate() over provided options.language object first', () => {
       const options = {
         language: {
-          errors: { number: { base: '!!is it number?' } }
+          number: { base: '!!is it number?' }
         }
       };
       const { error } = schema.validate({ number: 'string' }, options);
@@ -115,29 +103,57 @@ describe('joi-i18n', () => {
     });
 
     it('should format Joi.validate() over child schema\'s options first', () => {
-      const schema = Joi.object({
+      const schema1 = Joi.object({
+        boolean: Joi.boolean()
+      });
+      const { error: error1 } = schema1.validate({ boolean: 'string' });
+      expect(error1).to.exist;
+      expect(error1).to.have.nested.property('details[0].message')
+        .that.equals(`"boolean" must be a boolean`)
+        .and.not.equals(`is it boolean?`);
+
+      const schema2 = Joi.object({
         boolean: Joi.boolean().options({
           language: {
-            errors: { boolean: { base: '!!is it boolean?' } }
+            boolean: { base: '!!is it boolean?' }
           }
         })
       });
-      const { error } = schema.validate({ boolean: 'string' });
-      expect(error).to.exist;
-      expect(error).to.have.nested.property('details[0].message', `is it boolean?`);
+      const { error: error2 } = schema2.validate({ boolean: 'string' });
+      expect(error2).to.exist;
+      expect(error2).to.have.nested.property('details[0].message')
+        .that.equals(`is it boolean?`)
+        .and.not.equals(`"boolean" must be a boolean`);
     });
 
     it('should not mutate provided options object', () => {
       const options = {
         language: {
-          errors: { number: { base: '!!is it number?' } }
+          number: { base: '!!is it number?' }
         }
       };
       schema.validate({}, options);
       expect(options).to.deep.equals({
         language: {
-          errors: { number: { base: '!!is it number?' } }
+          number: { base: '!!is it number?' }
         }
+      });
+    });
+
+    describe('setDefaultLocale', () => {
+      before(() => Joi.setDefaultLocale('ko_KR'));
+      after(() => Joi.setDefaultLocale(null));
+
+      it('should throw error under invalid locale string', () => {
+        expect(() => {
+          Joi.setDefaultLocale('!@$%$')
+        }).to.throw('"locale" must only contain alpha-numeric and underscore characters');
+      });
+
+      it('should format Joi.validate() over Joi.setDefaultLocale() first', () => {
+        const { error } = schema.validate({ number: 'string' });
+        expect(error).to.exist;
+        expect(error).to.have.nested.property('details[0].message', `"number" 은(는) 숫자 형태여야 합니다`);
       });
     });
   });

@@ -2,25 +2,23 @@ import * as Joi from 'joi';
 import { reach, assert, merge, overrideMethodProperty } from './utils';
 
 namespace Schemas {
-  export const locale = Joi.string().token();
+  export const locale = Joi.string().token().allow(null).label('locale');
   export const errorDescriptor = Joi.alternatives().try([
     Joi.string().allow(null),
     Joi.func(),
     Joi.object().pattern(/.+/, Joi.lazy(() => errorDescriptor).required()),
-  ]);
+  ]).label('descriptor');
   export const addLocaleOptions = Joi.object({
     locale: locale.required(),
     language: Joi.object({
-      errors: Joi.object({
-        root: Joi.string(),
-        key: Joi.string(),
-        message: Joi.object({
-          wrapArrays: Joi.boolean()
-        })
-      }).pattern(/.+/, Joi.object().pattern(/.+/, errorDescriptor.required()))
-        .required()
-    }).required()
-  });
+      root: Joi.string(),
+      key: Joi.string(),
+      message: Joi.object({
+        wrapArrays: Joi.boolean()
+      })
+    }).pattern(/.+/, Joi.object().pattern(/.+/, errorDescriptor.required()))
+      .required()
+  }).label('options');
 }
 
 const internals = {
@@ -49,7 +47,7 @@ function setDefaultLocale(locale: string, supressWarning?: boolean) {
     if (locale in internals.locales) {
       internals.defaultLocale = locale;
     } else if (!supressWarning) {
-      console.error(`locale ${locale} is not registered! This operation will be igrnored.`)
+      console.warn(`locale ${locale} is not registered! This operation will be igrnored.`)
     }
   }
 }
@@ -80,14 +78,18 @@ function injectLocale() {
         // override locale wrapper if exists
         if (locale && locale in internals.locales) {
           // pick language from global locale or validator._settings
-          const errors = reach(this, `_settings.language.errors`) // use given settings first
-            || reach(internals.locales, `${locale}.errors`); // use global locale settings second
+          const localizations = reach(this, `_settings.language`) // use given settings first
+            || reach(internals.locales, locale); // use global locale settings second
 
-          if (typeof errors === 'object' && Object.keys(errors).length > 0) {
+          if (typeof localizations === 'object' && Object.keys(localizations).length > 0) {
             if (options) {
               options = {
                 ...options,
-                language: options.language ? merge({ errors: { ...errors } }, options.language) : errors
+                language: options.language ? merge({
+                  key: localizations.key,
+                  root: localizations.root,
+                  messages: localizations.messages
+                }, options.language) : localizations
               };
             }
 
@@ -99,7 +101,9 @@ function injectLocale() {
               }
 
               // get template function or string
-              const template = reach(error.options, `language.errors.${error.type}`) || reach(errors, error.type);
+              const template = reach(error.options, `language.${error.type}`)
+                || reach(options, `language.${error.type}`)
+                || reach(localizations, error.type);
               if (typeof template === 'function') {
                 error.message = template(error);
               } else if (typeof template === 'string') {
