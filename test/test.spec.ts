@@ -40,6 +40,21 @@ describe('joi-i18n', () => {
     });
   });
 
+  before(() => {
+    Joi.addLocaleData('ko_KR', {
+      number: {
+        base: (error) => `"${error.path}" 은(는) 숫자 형태여야 합니다`,
+        required: '!!{{key}}가 정의되지 않았습니다.'
+      },
+      boolean: {
+        base: '!!{{key}}는 boolean 형태로 제공해 주세요.'
+      }
+    });
+    Joi.addLocaleData('custom_key_locale', {
+      key: '[{{key}}] '
+    });
+  })
+
   describe('setDefaultLocale', () => {
     before(() => Joi.setDefaultLocale('ko_KR'));
     after(() => Joi.setDefaultLocale(null));
@@ -58,21 +73,6 @@ describe('joi-i18n', () => {
   });
 
   describe('validate', () => {
-    before(() => {
-      Joi.addLocaleData('ko_KR', {
-        number: {
-          base: (error) => `"${error.path}" 은(는) 숫자 형태여야 합니다`,
-          required: '!!{{key}}가 정의되지 않았습니다.'
-        },
-        boolean: {
-          base: '!!{{key}}는 boolean 형태로 제공해 주세요.'
-        }
-      });
-      Joi.addLocaleData('custom_key_locale', {
-        key: '[{{key}}] '
-      });
-    })
-
     const schema = Joi.object({
       number: Joi.number().required(),
       string: Joi.string()
