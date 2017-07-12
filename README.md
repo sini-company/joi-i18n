@@ -18,15 +18,13 @@ import * as Joi from 'joi';
 
 // add locale data
 Joi.addLocaleData('en_US', {
-  errors: {
-    any: {
-      // using joi's template syntax
-      required: `!!oh no, "{{key}}" is required!!!`
-    },
-    object: {
-      // using it's own joi error item formatter
-      allowUnknown: (error) => `"${error.context.key}" is not allowed here!!`
-    }
+  any: {
+    // using joi's template syntax
+    required: `!!oh no, "{{key}}" is required!!!`
+  },
+  object: {
+    // using it's own joi error item formatter
+    allowUnknown: (error) => `"${error.context.key}" is not allowed here!!`
   }
 })
 
@@ -66,12 +64,12 @@ https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-ca
 - `options` an optional object with same signature of original with an additional key:
   - `locale` a registered locale via [Joi#addLocaleData()](#joiaddlocaledatalocale-data)
 
-### `Joi.addLocaleData(locale, data)`
+### `Joi.addLocaleData(locale, language)`
 
 Registers a new locale data where:
 
 - `locale` a string represents a locale for given data
-- `data` language configuration object that gets passed to the Joi's validate options.
+- `language` language configuration object that gets passed to the Joi's validate options.
 (See [Joi#validate](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) or [joi/lib/language.js](https://github.com/hapijs/joi/blob/master/lib/language.js) for more information.
   - it supports two type for descriptor value:
     - string that uses Joi's template syntax
