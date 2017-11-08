@@ -40,6 +40,22 @@ describe('joi-i18n', () => {
     });
   });
 
+  describe('getLocaleData', () => {
+    it('should return same data with under same locale', () => {
+      const data = {
+        any: {
+          base: '!!Good',
+        }
+      };
+      Joi.addLocaleData('test_locale_5', data);
+      expect(data).to.deep.equals(Joi.getLocaleData('test_locale_5'));
+    });
+
+    it('should not return any value under unregistered locale', () => {
+      expect(Joi.getLocaleData('unregistered')).to.not.exist;
+    });
+  })
+
   before(() => {
     Joi.addLocaleData('ko_KR', {
       number: {
@@ -70,6 +86,15 @@ describe('joi-i18n', () => {
       expect(error).to.exist;
       expect(error).to.have.nested.property('details[0].message', `"number" 은(는) 숫자 형태여야 합니다`);
     });
+  });
+
+  describe('getDefaultLocale', () => {
+    it('should return registered default locale', () => {
+      const locale = 'default_registered_locale';
+      Joi.addLocaleData(locale, {});
+      Joi.setDefaultLocale(locale);
+      expect(Joi.getDefaultLocale()).to.equals(locale);
+    })
   });
 
   describe('validate', () => {
