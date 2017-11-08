@@ -94,7 +94,39 @@ describe('joi-i18n', () => {
       Joi.addLocaleData(locale, {});
       Joi.setDefaultLocale(locale);
       expect(Joi.getDefaultLocale()).to.equals(locale);
-    })
+    });
+  });
+
+  describe('formatErrorDetails', () => {
+    before(() => {
+      Joi.addLocaleData('format_locale', {
+        any: { required: 'REQUIRED!!' },
+        boolean: { base: (error) => `${error.context.key} IS NOT A BOOLEAN` }
+      });
+    });
+
+    it('should format existing joi error to target locale (template string)', () => {
+      const result = Joi.object({ required: Joi.any().required() }).validate({});
+      expect(result.error).to.exist;
+      const formattedError = Joi.formatErrorDetails(result.error, 'format_locale');
+      expect(formattedError).to.have.nested.property('details.0.message', '"required" REQUIRED!!');
+    });
+
+    it('should format existing joi error to target locale (function)', () => {
+      const result = Joi.object({ boolean: Joi.boolean() }).validate({ boolean: 1 });
+      expect(result.error).to.exist;
+
+      const formattedError = Joi.formatErrorDetails(result.error, 'format_locale');
+      expect(formattedError).to.have.nested.property('details.0.message', 'boolean IS NOT A BOOLEAN')
+    });
+
+    it('will not format joi error when no custom language provided', () => {
+      const result = Joi.object({ number: Joi.number() }).validate({ number: 'true' });
+      expect(result.error).to.exist;
+
+      const formattedError = Joi.formatErrorDetails(result.error, 'format_locale');
+      expect(formattedError.details).to.deep.equals(result.error.details);
+    });
   });
 
   describe('validate', () => {

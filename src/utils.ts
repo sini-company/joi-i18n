@@ -11,6 +11,18 @@ export function reach(target: object, path: string): any {
   return target;
 }
 
+export function set<T extends object>(target: T, path: string, value: any): T {
+  path.split('.').reduce((res, path, index, array) => {
+    if (index === array.length - 1) {
+      res[path] = value;
+    } else {
+      res[path] = typeof res[path] === 'object' ? res[path] : {};
+    }
+    return res[path];
+  }, target);
+  return target;
+}
+
 export function merge(target: object, source: object) {
   for (const key in source) {
     try {

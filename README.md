@@ -74,11 +74,11 @@ Registers a new locale data where:
     - string that uses Joi's template syntax
     - formatter function that receives Joi's ValidationError item
 
-### `Joi.getLocaleData(locale)`
+### `Joi.getLocaleData([locale])`
 
 Returns a registered locale data where:
 
-- `locale` a string represents a locale to retrieve
+- `[locale]` an optional string represents a locale to retrieve
 
 ### `Joi.setDefaultLocale(locale)`
 
@@ -89,6 +89,13 @@ A static method that will set default locale for every validate options where:
 ### `Joi.getDefaultLocale()`
 
 Returns a string represents registered default locale
+
+### `Joi.formatErrorDetails(error, [locale])`
+
+Returns a joi validation error item with locale formatted details where:
+
+- `error` a Joi validation error object
+- `[locale]` an optional string represents a locale to format
 
 ## Description
 

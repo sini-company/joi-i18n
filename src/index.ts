@@ -1,5 +1,5 @@
 import * as Joi from 'joi';
-import { reach, assert, merge, overrideMethodProperty } from './utils';
+import { assert, reach, set, merge, overrideMethodProperty } from './utils';
 
 namespace Schemas {
   export const locale = Joi.string().token().allow(null).label('locale');
@@ -37,7 +37,8 @@ function addLocaleData(locale: string, language: Joi.LanguageDescriptor) {
   internals.locales[locale] = language;
 }
 
-function getLocaleData(locale: string = internals.defaultLocale): Joi.LanguageDescriptor {
+function getLocaleData(locale?: string): Joi.LanguageDescriptor {
+  locale = locale || internals.defaultLocale;
   return internals.locales[locale];
 }
 
@@ -60,6 +61,47 @@ function getDefaultLocale(): string {
   return internals.defaultLocale;
 }
 
+function formatErrorDetails(error: Joi.ValidationError, locale?: string): Joi.ValidationError {
+  locale = locale || getDefaultLocale();
+  if (locale) {
+    const language = getLocaleData(locale);
+    if (Object.keys(language).length > 0 && Array.isArray(error.details)) {
+      // shallow clone error
+      error = Object.create(
+        Object.getPrototypeOf(error),
+        Object.getOwnPropertyNames(error).reduce((res, key) =>
+          (res[key] = Object.getOwnPropertyDescriptor(error, key), res),
+          {}
+        )
+      );
+
+      // map error details
+      error.details = error.details.map((item) => {
+        let message: string;
+        const template = reach(language, item.type);
+
+        if (typeof template === 'function') {
+          message = template(item);
+
+        } else if (typeof template === 'string') {
+          const context = { ...item.context };
+          message = (Joi as any).createError(
+            item.type,
+            context,
+            { ...context, path: item.path },
+            { language }
+          ).toString();
+        }
+
+        return message ? { ...item, message } : item;
+      });
+    }
+  } else {
+    console.warn(`locale ${locale} is not registered! This operation will be igrnored.`)
+  }
+  return error;
+}
+
 function injectLocale() {
   if (Joi['_locales'] === undefined) {
     // set locales data
@@ -70,6 +112,7 @@ function injectLocale() {
     (Joi as Partial<typeof Joi>).getLocaleData = getLocaleData;
     (Joi as Partial<typeof Joi>).setDefaultLocale = setDefaultLocale;
     (Joi as Partial<typeof Joi>).getDefaultLocale = getDefaultLocale;
+    (Joi as Partial<typeof Joi>).formatErrorDetails = formatErrorDetails;
 
     // set default locales if available
     if (process !== undefined && typeof process.env.LANG === 'string') {
