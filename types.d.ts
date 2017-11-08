@@ -8,7 +8,9 @@ declare module 'joi' {
     locale?: string;
   }
   export function addLocaleData(locale: string, language: LanguageDescriptor);
+  export function getLocaleData(locale: string): LanguageDescriptor;
   export function setDefaultLocale(locale: string);
+  export function getDefaultLocale(): string;
 
   export type ErrorFormatFunction = (error: ValidationErrorItem) => string;
   export type ErrorTypeDescriptor = string | boolean | ErrorFormatFunction | {

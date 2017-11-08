@@ -26,7 +26,7 @@ const internals = {
   defaultLocale: undefined
 };
 
-function addLocaleData(locale: string, language: Joi.LanguageRootOptions) {
+function addLocaleData(locale: string, language: Joi.LanguageDescriptor) {
   // assert arguments
   assert({ locale, language }, Schemas.addLocaleOptions);
 
@@ -37,7 +37,7 @@ function addLocaleData(locale: string, language: Joi.LanguageRootOptions) {
   internals.locales[locale] = language;
 }
 
-function getLocaleData(locale: string = internals.defaultLocale): Joi.LanguageRootOptions {
+function getLocaleData(locale: string = internals.defaultLocale): Joi.LanguageDescriptor {
   return internals.locales[locale];
 }
 
@@ -67,7 +67,9 @@ function injectLocale() {
 
     // add joi-i18n helper methods to the root Joi object
     (Joi as Partial<typeof Joi>).addLocaleData = addLocaleData;
+    (Joi as Partial<typeof Joi>).getLocaleData = getLocaleData;
     (Joi as Partial<typeof Joi>).setDefaultLocale = setDefaultLocale;
+    (Joi as Partial<typeof Joi>).getDefaultLocale = getDefaultLocale;
 
     // set default locales if available
     if (process !== undefined && typeof process.env.LANG === 'string') {
