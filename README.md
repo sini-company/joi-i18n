@@ -2,8 +2,7 @@
 
 An i18n support mixins for [Joi](https://github.com/hapijs/joi) object validator.
 
-[![Build Status](https://travis-ci.org/sini-company/joi-i18n.svg?branch=master)](https://travis-ci.org/sini-company/joi-i18n) [![Current Version](https://img.shields.io/npm/v/joi-i18n.svg?style=flat)](https://www.npmjs.com/package/joi-i18n) [![Known Vulnerabilities](https://snyk.io/test/github/sini-company/joi-i18n/badge.svg)](https://snyk.io/test/github/sini-company/joi-i18n)
-
+[![Build Status](https://travis-ci.org/sini-company/joi-i18n.svg?branch=master)](https://travis-ci.org/sini-company/joi-i18n) [![Current Version](https://img.shields.io/npm/v/joi-i18n.svg?style=flat)](https://www.npmjs.com/package/joi-i18n)
 
 ## Usage
 ```js
@@ -41,13 +40,13 @@ const { error } = schema.validate(value, { locale: 'en_US' });
 // [
 //   {
 //     message: 'oh no, "required" is required!!!',
-//     path: 'required',
+//     path: ['required'],
 //     type: 'any.required',
 //     context: { key: 'required' }
 //   },
 //   {
 //     message: '"unknown" is not allowed here!!',
-//     path: 'value',
+//     path: ['value'],
 //     type: 'object.allowUnknown',
 //     context: { child: 'unknown', key: 'value' }
 //   }
@@ -75,11 +74,21 @@ Registers a new locale data where:
     - string that uses Joi's template syntax
     - formatter function that receives Joi's ValidationError item
 
+### `Joi.getLocaleData(locale)`
+
+Returns a registered locale data where:
+
+- `locale` a string represents a locale to retrieve
+
 ### `Joi.setDefaultLocale(locale)`
 
 A static method that will set default locale for every validate options where:
 
 - `locale` a registered locale via [Joi#addLocaleData()](#joiaddlocaledatalocale-data)
+
+### `Joi.getDefaultLocale()`
+
+Returns a string represents registered default locale
 
 ## Description
 

@@ -26,7 +26,7 @@ const internals = {
   defaultLocale: undefined
 };
 
-function addLocaleData(locale: string, language: object) {
+function addLocaleData(locale: string, language: Joi.LanguageRootOptions) {
   // assert arguments
   assert({ locale, language }, Schemas.addLocaleOptions);
 
@@ -37,7 +37,11 @@ function addLocaleData(locale: string, language: object) {
   internals.locales[locale] = language;
 }
 
-function setDefaultLocale(locale: string, supressWarning?: boolean) {
+function getLocaleData(locale: string = internals.defaultLocale): Joi.LanguageRootOptions {
+  return internals.locales[locale];
+}
+
+function setDefaultLocale(locale: string, supressWarning?: boolean): void {
   if (locale === null) {
     // unset default locale
     delete internals.defaultLocale;
@@ -52,6 +56,10 @@ function setDefaultLocale(locale: string, supressWarning?: boolean) {
   }
 }
 
+function getDefaultLocale(): string {
+  return internals.defaultLocale;
+}
+
 function injectLocale() {
   if (Joi['_locales'] === undefined) {
     // set locales data
@@ -64,6 +72,12 @@ function injectLocale() {
     // set default locales if available
     if (process !== undefined && typeof process.env.LANG === 'string') {
       Joi.setDefaultLocale.call(this, process.env.LANG.split('.', 1).shift(), true);
+    }
+
+    if (typeof process !== 'undefined' && typeof process.env.LANG === 'string') {
+      Joi.setDefaultLocale.call(this, process.env.LANG.split('.', 1).shift(), true);
+    } else if (typeof navigator !== 'undefined' && typeof navigator.language === 'string') {
+      Joi.setDefaultLocale.call(this, navigator.language);
     }
 
     // extract prototype of Joi.Any
