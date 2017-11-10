@@ -4,12 +4,6 @@ import { expect } from 'chai';
 
 describe('joi-i18n', () => {
   describe('addLocaleData', () => {
-    it('should throw error under invalid locale code', () => {
-      expect(() => {
-        Joi.addLocaleData('!!invalid_character!!', { any: {} });
-      }).to.throw('"locale" must only contain alpha-numeric and underscore characters');
-    });
-
     it('should throw error under invalid language object', () => {
       expect(() => {
         Joi.addLocaleData('test_locale_1', { any: null });
@@ -74,12 +68,6 @@ describe('joi-i18n', () => {
   describe('setDefaultLocale', () => {
     before(() => Joi.setDefaultLocale('ko_KR'));
     after(() => Joi.setDefaultLocale(null));
-
-    it('should throw error under invalid locale string', () => {
-      expect(() => {
-        Joi.setDefaultLocale('!@$%$')
-      }).to.throw('"locale" must only contain alpha-numeric and underscore characters');
-    });
 
     it('should format Joi.validate() in default locale', () => {
       const { error } = Joi.object({ number: Joi.number() }).validate({ number: 'string' });
