@@ -2,7 +2,7 @@ import * as Joi from 'joi';
 import { assert, reach, set, merge, overrideMethodProperty } from './utils';
 
 namespace Schemas {
-  export const locale = Joi.string().token().allow(null).label('locale');
+  export const locale = Joi.string().allow(null).label('locale');
   export const errorDescriptor = Joi.alternatives().try([
     Joi.string().allow(null),
     Joi.func(),
