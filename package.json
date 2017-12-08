@@ -16,15 +16,15 @@
     "joi": ">=10.4.x"
   },
   "devDependencies": {
-    "@types/chai": "^4.0.4",
-    "@types/joi": "^10.4.4",
+    "@types/chai": "^4.0.8",
+    "@types/joi": "^13.0.2",
     "@types/mocha": "^2.2.44",
-    "@types/node": "^8.0.50",
+    "@types/node": "^8.0.57",
     "chai": "^4.1.2",
-    "joi": "^13.0.1",
+    "joi": "^13.0.2",
     "mocha": "^4.0.1",
     "ts-mocha": "^1.0.3",
-    "typescript": "^2.6.1"
+    "typescript": "^2.6.2"
   },
   "engines": {
     "node": ">=4.0.0"
