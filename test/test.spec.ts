@@ -150,7 +150,7 @@ describe('joi-i18n', () => {
     it('should format Joi.validate() with custom key option', () => {
       const { error } = Joi.validate({ number: 'string' }, schema.options({ locale: 'custom_key_locale' }));
       expect(error).to.exist;
-      expect(error).to.have.nested.property('details[0].message', `[number] must be a number`);
+      expect(error).to.have.nested.property('details[0].message', `"number" must be a number`);
     });
 
     it('should format Joi.validate() over provided options.language object first', () => {
