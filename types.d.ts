@@ -7,9 +7,9 @@ declare module 'joi' {
      */
     locale?: string;
   }
-  export function addLocaleData(locale: string, language: LanguageDescriptor);
+  export function addLocaleData(locale: string, language: LanguageDescriptor): void;
   export function getLocaleData(locale?: string): LanguageDescriptor;
-  export function setDefaultLocale(locale: string);
+  export function setDefaultLocale(locale: string): void;
   export function getDefaultLocale(): string;
   export function formatErrorDetails(error: ValidationError, locale?: string): ValidationError;
 
